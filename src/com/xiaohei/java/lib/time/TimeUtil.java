@@ -493,27 +493,27 @@ public class TimeUtil {
      * @return
      */
     public static String time2zodiac(int time) {
-        if (time >= 23 || time < 1)
+        if (time >= 24 || time < 2)
             return "子时";
-        if (time >= 1 || time < 3)
+        if (time >= 2 || time < 4)
             return "丑时";
-        if (time >= 3 || time < 5)
+        if (time >= 4 || time < 6)
             return "寅时";
-        if (time >= 5 || time < 7)
+        if (time >= 6 || time < 8)
             return "卯时";
-        if (time >= 7 || time < 9)
+        if (time >= 8 || time < 10)
             return "辰时";
-        if (time >= 9 || time < 11)
+        if (time >= 10 || time < 12)
             return "巳时";
-        if (time >= 11 || time < 13)
+        if (time >= 12 || time < 14)
             return "午时";
-        if (time >= 13 || time < 15)
+        if (time >= 14 || time < 16)
             return "未时";
-        if (time >= 15 || time < 17)
+        if (time >= 16 || time < 18)
             return "申时";
-        if (time >= 17 || time < 19)
+        if (time >= 18 || time < 20)
             return "酉时";
-        if (time >= 19 || time < 21)
+        if (time >= 20 || time < 22)
             return "戌时";
         return "亥时";
     }
