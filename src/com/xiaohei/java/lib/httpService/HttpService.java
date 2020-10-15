@@ -881,6 +881,8 @@ public abstract class HttpService {
      * Common MIME type for dynamic content: plain text
      */
     public static final String MIME_PLAINTEXT = "text/plain";
+    public static final String MIME_CSS = "text/css";
+    public static final String MIME_IMAGE = "image/jpeg";
 
     /**
      * Common MIME type for dynamic content: html
