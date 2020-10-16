@@ -6,10 +6,7 @@ import com.xiaohei.java.lib.thread.pool.IOThreadPool;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class PoolManager {
     private static volatile ThreadPoolExecutor singleThread = new CPUThreadPool(1);
@@ -214,5 +211,64 @@ public class PoolManager {
 
     public static List<java.lang.Runnable> scheduledShutdownNow() {
         return scheduledThread.shutdownNow();
+    }
+
+    public static void race(java.lang.Runnable runnable, java.lang.Runnable... runnables) {
+        if (runnable == null) {
+            if (runnables == null || runnables.length <= 0)
+                return;
+            for (java.lang.Runnable r : runnables)
+                longTime(r);
+            return;
+        }
+        if (runnables == null || runnables.length <= 0) {
+            longTime(runnable);
+            return;
+        }
+        longTime(new RaceRefereeRunnable(runnable,runnables));
+    }
+
+    private static class RaceRefereeRunnable implements java.lang.Runnable {
+        CountDownLatch countDownLatch;
+        private java.lang.Runnable runnable;
+        private List<java.lang.Runnable> runnables;
+
+        public RaceRefereeRunnable(java.lang.Runnable runnable, java.lang.Runnable... runnables) {
+            int len = runnables.length;
+            countDownLatch = new CountDownLatch(len);
+            this.runnables = new ArrayList(len);
+            for (int i = 0; i < len; i++) {
+                this.runnables.add(new RaceRunnable(countDownLatch, runnables[i]));
+            }
+            this.runnable = runnable;
+        }
+
+        @Override
+        public void run() {
+            try {
+                for (java.lang.Runnable runnable : runnables)
+                    longTime(runnable);
+                countDownLatch.await();
+                runnable.run();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static class RaceRunnable implements java.lang.Runnable {
+        CountDownLatch countDownLatch;
+        java.lang.Runnable runnable;
+
+        RaceRunnable(CountDownLatch countDownLatch, java.lang.Runnable runnable) {
+            this.countDownLatch = countDownLatch;
+            this.runnable = runnable;
+        }
+
+        @Override
+        public void run() {
+            runnable.run();
+            countDownLatch.countDown();
+        }
     }
 }
