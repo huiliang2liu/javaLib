@@ -192,50 +192,50 @@ public class Calendar {
             dayName = dayNames[day - 1];
             if (month1 == 1) {
                 if (day1 == 1)
-                    dayName = "元旦";
+                    dayName = "元旦节";
             } else if (month1 == 2) {
                 if (day1 == 14)
-                    dayName = "情人";
+                    dayName = "情人节";
             } else if (month1 == 3) {
                 if (day1 == 8)
-                    dayName = "妇女";
+                    dayName = "妇女节";
                 else if (day1 == 12)
-                    dayName = "植树";
+                    dayName = "植树节";
                 else if (day1 == 15)
                     dayName = "消费者权益日";
             }else if(month1==4){
                 if(day1==1)
-                    dayName="愚人";
+                    dayName="愚人节";
             }else if(month1==5){
                 if(day1==1)
-                    dayName="劳动";
+                    dayName="劳动节";
                 else if(day1==4)
-                    dayName="青年";
+                    dayName="青年节";
                 else if(day1==12)
-                    dayName="护士";
+                    dayName="护士节";
             }else if(month1==6){
                 if(day1==1)
-                    dayName="儿童";
+                    dayName="儿童节";
             }else if(month1==7){
                 if(day1==1)
-                    dayName="建党";
+                    dayName="建党节";
             }else if(month1==8){
                 if(day1==1)
-                    dayName="建军";
+                    dayName="建军节";
                 else if(day1==8)
-                    dayName="父亲";
+                    dayName="父亲节";
             }else if(month1==9){
                 if(day1==9)
                     dayName="毛泽东逝世纪念";
                 else if(day1==10)
-                    dayName="教师";
+                    dayName="教师节";
                 else if(day1==28)
                     dayName="孔子诞辰";
             }else if(month1==10){
                 if(day1==1)
-                    dayName="国庆";
+                    dayName="国庆节";
                 else if(day1==6)
-                    dayName="老人";
+                    dayName="老人节";
                 else if(day1==24)
                     dayName="联合国日";
                 else if(day1==31)
@@ -247,29 +247,29 @@ public class Calendar {
                 if(day1==20)
                     dayName="澳门回归纪念";
                 else if(day1==25)
-                    dayName="圣诞";
+                    dayName="圣诞节";
                 else if(day1==26)
                     dayName="毛泽东诞辰纪念";
             }
             if(month==1){
                 if(day==1)
-                    dayName="春节";
+                    dayName="春节节";
                 else if(day==15)
-                    dayName="元宵";
+                    dayName="元宵节";
             }else if(month==5){
                 if(day==5)
-                    dayName="端午";
+                    dayName="端午节";
             }else if(month==7){
                 if(day==7)
-                    dayName="七夕";
+                    dayName="七夕节";
                 else if(day==15)
-                    dayName="中元";
+                    dayName="中元节";
             }else if(month==8){
                 if(day==15)
-                    dayName="中秋";
+                    dayName="中秋节";
             }else if(month==9){
                 if(day==9)
-                    dayName="重阳";
+                    dayName="重阳节";
             }else if(month==12){
                 if(day==8)
                     dayName="腊八";
