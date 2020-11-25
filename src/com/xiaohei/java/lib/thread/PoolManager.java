@@ -11,7 +11,8 @@ import java.util.concurrent.*;
 public class PoolManager {
     private static volatile ThreadPoolExecutor singleThread = new CPUThreadPool(1);
     private static volatile ThreadPoolExecutor shortTimeThread = new CPUThreadPool(Integer.MAX_VALUE);
-    private static volatile ThreadPoolExecutor longTimeThread = new CPUThreadPool();
+//    private static volatile ThreadPoolExecutor longTimeThread = new CPUThreadPool();
+    private static volatile ThreadPoolExecutor longTimeThread = new CPUThreadPool(Integer.MAX_VALUE);
     private static volatile ThreadPoolExecutor ioThread = new IOThreadPool();
     private static volatile ScheduledThreadPoolExecutor scheduledThread = new ScheduledThreadPoolExecutor(0);
 

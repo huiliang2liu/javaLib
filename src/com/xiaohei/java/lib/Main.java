@@ -1,29 +1,32 @@
 package com.xiaohei.java.lib;
 
-import com.sun.source.tree.LineMap;
-import com.xiaohei.java.lib.httpService.DefaultResponse;
-import com.xiaohei.java.lib.httpService.Service;
-import com.xiaohei.java.lib.io.StreamUtil;
-import com.xiaohei.java.lib.reflect.FieldManager;
-import com.xiaohei.java.lib.util.Monkey;
-import jdk.nashorn.internal.codegen.CompilerConstants;
-import sun.misc.LRUCache;
+import com.xiaohei.java.lib.http.HttpManage;
+import com.xiaohei.java.lib.http.request.FlowRequest;
+import com.xiaohei.java.lib.http.request.Request;
+import com.xiaohei.java.lib.http.response.Response;
+import com.xiaohei.java.lib.http.util.Method;
+import com.xiaohei.java.lib.json.JSONArray;
+import com.xiaohei.java.lib.json.JSONException;
+import com.xiaohei.java.lib.json.JSONObject;
+import com.xiaohei.java.lib.paras.DOMParas;
+import com.xiaohei.java.lib.paras.NodeTree;
+import com.xiaohei.java.lib.rx.FilterFunction;
+import com.xiaohei.java.lib.rx.MapFunction;
+import com.xiaohei.java.lib.rx.Observable;
+import com.xiaohei.java.lib.rx.SubscribeFunction;
+import com.xiaohei.java.lib.thread.PoolManager;
+import com.xiaohei.java.lib.time.Calendar;
+import com.xiaohei.java.lib.util.MachinUtil;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.lang.reflect.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
     private static class TestThreadLocal {
@@ -87,478 +90,150 @@ public class Main {
         }
     }
 
+    private static String[] gan_info = {"甲", "乙", "丙", "丁", "戊", "己", "庚", "辛",
+            "壬", "癸"};
+    private static String[] zhi_info = {"子", "丑", "寅", "卯", "辰", "巳", "午", "未",
+            "申", "酉", "戌", "亥"};
+
+    static ServerSocket serverSocket;
+    static int port;
+
     public static void main(String[] args) {
-        Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd");
-        System.out.println(simpleDateFormat.format(date));
-    }
-
-    private final StringBuffer TEST = new StringBuffer("======");
-    public static int test = 1;
-
-    public static void test() {
-        try {
-            test++;
-            System.out.println(String.format("try:%d", test));
-            return;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            test++;
-            System.out.println(String.format("finally:%d", test));
-        }
-    }
-
-    public static boolean isIp(String ip) {
-        if (ip == null || ip.isEmpty())
-            return false;
-        String splits[] = ip.split("\\.");
-        if (splits.length != 4)
-            return false;
-        for (String st : splits) {
-            try {
-                int a = Integer.valueOf(st);
-                if (a < 0 || a > 255)
-                    return false;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static MaxString maxString(String st) {
-        MaxString maxString = new MaxString();
-        if (st != null && st.length() > 0) {
-            char chars[] = st.toCharArray();
-            StringBuffer sb = new StringBuffer();
-            for (char ch : chars) {
-                if (ch > 47 && ch < 58) {
-                    sb.append(ch);
-                } else {
-                    int len = sb.length();
-                    if (len > 0) {
-                        if (len > maxString.len) {
-                            maxString.len = len;
-                            maxString.st = sb.toString();
-                        }
-                        sb.setLength(0);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        PoolManager.longTime(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    serverSocket = new ServerSocket(0);
+                    port = serverSocket.getLocalPort();
+                    countDownLatch.countDown();
+                    while (true) {
+                        Socket socket = serverSocket.accept();
+                        System.out.println("0.0.0.0收到请求");
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }
-            int len = sb.length();
-            if (len > 0 && len > maxString.len) {
-                maxString.len = len;
-                maxString.st = sb.toString();
-            }
-        }
-        return maxString;
-    }
 
-    public static class MaxString {
-        int len = 0;
-        String st = "";
-    }
-
-    public static String geshihua(double rmb) {
-        StringBuffer sb = new StringBuffer("人民币");
-        long yuan = (long) rmb;
-        int yi = (int) (yuan / 10000000000l);
-        if (yi > 0) {
-            sb.append(num2string(yi)).append("亿");
-            yuan %= 10000000000l;
-        }
-        int wan = (int) (yuan / 1000000);
-        if (wan > 0) {
-            sb.append(num2string(wan)).append("万");
-            yuan %= 1000000;
-        }
-        int yu = (int) (yuan / 100);
-        yuan %= 100;
-        sb.append(num2string((int) yu)).append("元");
-        if (yuan == 0) {
-            sb.append("整");
-        } else {
-            int jiao = (int) (yuan / 10);
-            yuan %= 10;
-            if (jiao > 0)
-                sb.append(num2string(jiao)).append("角");
-            int fen = (int) (yuan);
-            if (fen > 0)
-                sb.append(num2string(fen)).append("分");
-        }
-        return sb.toString();
-    }
-
-    public static String num2string(int num) {
-        StringBuffer sb = new StringBuffer();
-        int qian = num / 1000;
-        num %= 1000;
-        int bai = num / 100;
-        num %= 100;
-        int shi = num / 10;
-        int ge = num % 10;
-        if (qian > 0) {
-            sb.append(num2han(qian)).append("千");
-            if (bai > 0) {
-                sb.append(num2han(bai)).append("百");
-                if (shi > 0) {
-                    sb.append(num2han(shi)).append("拾");
-                    if (ge > 0)
-                        sb.append(num2han(ge));
-                } else {
-                    if (ge > 0)
-                        sb.append(num2han(0)).append(num2han(ge));
-                }
-            } else {
-                if (shi > 0) {
-                    sb.append(num2han(0)).append(shi > 1 ? num2han(shi) : "").append("拾");
-                    if (ge > 0)
-                        sb.append(ge);
-                } else {
-                    if (ge > 0)
-                        sb.append(num2han(0)).append(num2han(ge));
-                }
-            }
-        } else {
-            if (bai > 0) {
-                sb.append(num2han(bai)).append("百");
-                if (shi > 0) {
-                    sb.append(num2han(shi)).append("拾");
-                    if (ge > 0)
-                        sb.append(num2han(ge));
-                }
-            } else {
-                if (shi > 0) {
-                    sb.append(shi > 1 ? num2han(shi) : "").append("拾");
-                    if (ge > 0)
-                        sb.append(num2han(ge));
-                } else {
-                    if (ge > 0)
-                        sb.append(num2han(ge));
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-    static String[] strings = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", "拾"};
-
-    public static String num2han(int num) {
-        return strings[num];
-    }
-
-    public static String numAdd(String st) {
-        if (st == null || st.length() <= 0)
-            return null;
-        StringBuffer sb = new StringBuffer();
-        char chars[] = st.toCharArray();
-        boolean add = false;
-        for (char ca : chars) {
-            if (ca > 47 && ca < 58) {
-                if (add) {
-                    sb.append(ca);
-                } else {
-                    add = true;
-                    sb.append("*").append(ca);
-                }
-            } else {
-                if (add) {
-                    sb.append("*");
-                    add = false;
-                }
-                sb.append(ca);
-            }
-
-        }
-        return sb.toString();
-    }
-
-    public static int dengcha(int start, int cha, int num) {
-        int end = start + cha * (num - 1);
-        return (start + end) * num / 2;
-    }
-
-    public static int zishoushu(int n) {
-        int size = 0;
-        for (int i = 0; i < n; i++) {
-            long cheng = i * i;
-            String t = String.valueOf(i);
-            String ch = String.valueOf(cheng);
-            if (t.equals(ch.substring(ch.length() - t.length(), ch.length())))
-                size++;
-        }
-        return size;
-    }
-
-    public static Integer[] sort(Integer[] nums, int sortTag) {
-        Arrays.sort(nums, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                int cha = o1 - o2;
-                return sortTag == 0 ? cha : -cha;
             }
         });
-        return nums;
-    }
-
-    public static List<Test1> test(String st) {
-        List<Test1> list = new ArrayList<>();
-        if (st != null && st.length() > 0) {
-            char chars[] = st.toCharArray();
-            for (char ca : chars) {
-                Test1 test1 = new Test1(ca);
-                int index = list.indexOf(test1);
-                if (index >= 0)
-                    list.get(index).num++;
-                else
-                    list.add(test1);
-            }
-        }
-        list.sort(new Comparator<Test1>() {
+        CountDownLatch countDownLatch1 = new CountDownLatch(1);
+        PoolManager.longTime(new Runnable() {
             @Override
-            public int compare(Test1 o1, Test1 o2) {
-                return o2.num - o1.num;
-            }
-        });
-        return list;
-    }
-
-    public static class Test1 {
-        Test1(char ca) {
-            this.ca = ca;
-            num = 1;
-        }
-
-        char ca;
-        int num;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Test1 test1 = (Test1) o;
-            return ca == test1.ca;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(ca);
-        }
-    }
-
-    public static List<String> format(String[] strings) {
-        List<String> list = new ArrayList<>();
-        if (strings == null || strings.length <= 0)
-            return list;
-        for (String st : strings) {
-            int len = st.length();
-            int index = 0;
-            while (len > 0) {
-                if (len > 8) {
-                    list.add(format(st.substring(index, index + 8)));
-                    index += 8;
-                    len -= 8;
-                } else {
-                    list.add(format(st.substring(index, index + len)));
-                    break;
+            public void run() {
+                try {
+                    countDownLatch.await();
+//                    ServerSocket serverSocket = new ServerSocket();
+//                    serverSocket.bind(new InetSocketAddress("127.0.0.1", port));
+                    countDownLatch1.countDown();
+//                    while (true) {
+//                        Socket socket = serverSocket.accept();
+//                        System.out.println("127.0.0.1收到请求");
+//                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        }
-        return list;
-    }
-
-    public static String format(String st) {
-        if (st.length() == 8)
-            return st;
-        int len = st.length();
-        StringBuffer sb = new StringBuffer(st);
-        for (int i = 0; i < 8 - len; i++)
-            sb.append("0");
-        return sb.toString();
-    }
-
-
-    public static Test statistical(float[] nums) {
-        Test test = new Test();
-        if (nums != null && nums.length > 0) {
-            for (float num : nums) {
-                if (num > 0)
-                    test.average += num;
-                else
-                    test.negativeNumber += 1;
-            }
-            if (test.average > 0)
-                test.average /= (nums.length - test.negativeNumber);
-        }
-        return test;
-    }
-
-    public static class Test {
-        int negativeNumber = 0;
-        float average = 0;
-    }
-
-    static String horse(String st) {
-        if (st == null || st.isEmpty())
-            return st;
-        char chars[] = st.toCharArray();
-        StringBuffer sb = new StringBuffer();
-        for (int i = chars.length - 1; i > -1; i--) {
-            sb.append(chars[i]);
-        }
-        return sb.toString();
-    }
-
-    public static int i16to120(String text) {
-        if (text.startsWith("0x"))
-            text = text.substring(2);
-        text = text.toLowerCase();
-        char cs[] = text.toCharArray();
-        int j = 0;
-        int sum = 0;
-        for (int i = cs.length - 1; i > -1; i--) {
-            char c = cs[i];
-            sum += char2int(c) * Math.pow(16, j);
-            j++;
-        }
-        return sum;
-    }
-
-    public static int char2int(char c) {
-        if (c == '0')
-            return 0;
-        if (c == '1')
-            return 1;
-        if (c == '2')
-            return 2;
-        if (c == '3')
-            return 3;
-        if (c == '4')
-            return 4;
-        if (c == '5')
-            return 5;
-        if (c == '6')
-            return 6;
-        if (c == '7')
-            return 7;
-        if (c == '8')
-            return 8;
-        if (c == '9')
-            return 9;
-        if (c == 'a')
-            return 10;
-        if (c == 'b')
-            return 11;
-        if (c == 'c')
-            return 12;
-        if (c == 'd')
-            return 13;
-        if (c == 'e')
-            return 14;
-        if (c == 'f')
-            return 15;
-        return 0;
-    }
-
-
-    public static int p(int p) {
-        if (p < 2)
-            return 0;
-        if (p == 2)
-            return 1;
-        int shang = p / 3;
-        int modle = p % 3;
-        return shang + p(shang + modle);
-    }
-
-    static double abs(double x) {
-        return (x > 0 ? x : -x);
-    }
-
-    static double cubert(double y) {
-        double x;
-        for (x = 1.0; abs(x * x * x - y) > 1e-7; x = (2 * x + y / x / x) / 3) ;
-        return x;
-    }
-
-    public static double pow(double num, double p) {
-        if (p == 0)
-            return 1;
-        if (p < 0) {
-            double po = pow(num, -p);
-            return po == 0 ? po : 1.0 / po;
-        }
-        if (num < 0) {
-            if (p < 1)
-                return 0;
-            int intP = (int) p;
-            double po = num;
-            for (int i = 1; i < intP; i++) {
-                po *= num;
-            }
-            return po;
-        }
-        if (num < 1) {
-            double po = pow(1.0 / num, p);
-            return po == 0 ? po : 1.0 / po;
-        }
-        if (p < 1) {
-            p = 1.0 / p;
-            return 1;
-        }
-        int intP = (int) p;
-        if (intP - p == 0) {
-            double po = num;
-            for (int i = 1; i < intP; i++) {
-                po *= num;
-            }
-            return po;
-        } else {
-            double douP = p - intP;
-            return pow(num, intP) * pow(num, douP);
-        }
-    }
-
-    public static int LeastCommon(int a, int b) {
-        if (a == 0 || b == 0)
-            return 0;
-        if (a > b && a % b == 0)
-            return a;
-        if (a < b && b % a == 0)
-            return b;
-        return a * b / common(a, b);
-    }
-
-    public static int common(int a, int b) {
-        if (a == 0)
-            return b;
-        if (b == 0)
-            return a;
-        if (a == b)
-            return a;
-        if (a > b)
-            return common(b, a % b);
-        return common(a, b % a);
-    }
-
-
-    public static void readHead(InputStream inputStream) {
-        byte[] buff = new byte[3];
-        System.out.print("readHead:\t");
+        });
         try {
-            inputStream.read(buff);
-            System.out.print(String.format("%s\t", new String(buff)));
-            System.out.print(String.format("%d\t", inputStream.read()));
-            int i = inputStream.read();
-            System.out.print(String.format("%s\t", (i & 1) == 1 ? "有视频" : "没有视频"));
-            System.out.print(String.format("%s\t", (i & 4) == 4 ? "有音频" : "没有音频"));
-            System.out.println(readLen(inputStream));
-//            readBody(inputStream);
-        } catch (IOException e) {
+            countDownLatch1.await();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("开始发送请求");
+        for (int i = 0; i < 10; i++) {
+            try {
+                Socket socket = new Socket();
+                socket.connect(new InetSocketAddress("10.230.106.26", port));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
+
+    private static void goTest() {
+        test:
+        for (int i = 0; i < 10; i++) {
+            System.out.println("i=" + i);
+            for (int j = 0; j < 10; j++) {
+                if (j == i)
+                    continue test;
+                System.out.println("j=" + j);
+            }
+        }
+    }
+
+    private static void facebook() {
+        HttpManage manage = new HttpManage();
+        Map<String, String> head = new HashMap<>();
+        head.put("Accept", "application/json");
+        String appId = "378499546156658";
+        String placementId = "378499546156658_408632569810022";
+        int test = 0;
+        String flow = "{\"id\":\"706ae768998041f1a24e\"," +
+                "\"imp\":[{\"id\":\"FB Ad Impression\",\"tagid\":\"%s\"," +
+                "\"instl\":0,\"video\":{\"h\":0,\"w\":0,\"linearity\":2,\"ext\":{\"videotype\":\"rewarded\"}}}]," +
+                "\"app\":{\"publisher\":{\"id\":\"%s\"}}," +
+                "\"device\":{\"lmt\":1},\"regs\":{\"coppa\":0},\"at\":1,\"tmax\":1000,\"test\":%d," +
+                "\"ext\":{\"platformid\":\"%s\",\"bidding_kit_version\":\"0.5.1\"," +
+                "\"bidding_kit_source\":\"auction\",\"limited_data_use\":0," +
+                "\"id\":\"AzM4gjM1YDNxUDM2EzX4UjN2UTM2QTN5kDN4czMfFjV\"," +
+                "\"timestamp\":1605146528830},\"user\":{\"buyeruid\":\"eJx1VNtyozgQ\\/RXK+zJTZWPEncmTuNimgoEFnExq2FIJkBMq2LgAJzuZmn\\/fFthJ9mF4QTqnW91qne5fMxzH9s4P3Nm3GZrNZ75LHOxsPJKlZJsCuOCoA1aeS3yXIz\\/+AeQOBzFO8GjyK5\\/VPWGHcz77ls\\/2tOlZPpvnM3p6Jn39xkZYVSzd0M2RGOoDe2uPjLT7fc+GkZdNU+LfxfNE+oF2A6tIx2jfHkebAO9CyC0hq2gXugTHvoxGewhfseL8+EiLZgo3dOcpiREnL7Q5T0SY5\\/kSj1RxrpuKDD9P\\/2d+w\\/V2oZ89wNXGy8AeO46Xpr7tB4ATL8R24Lmf+TgO8dYDxK6rqj4+3tZDSg+nhpMbnBLvexQH+MFLwITnxn1WMWw0VdeQrBVVpRVaqVlMlitZMvaGWkgm3VMwTHnoKCSZP0ZAuqQh7mWJkmwCv8W3HO\\/poT8fH8fnShJ\\/DMW93Vt40hhPufP3U+bqXJsbc4TmSJ8jWJj8SV0vTCcLWdRljbs6ieeFZOP5600GuGEYlwPvvISnxPMXERKlD+N73802gKvoIqc02iUOzy+MyBr0Mh4AW3qsurauYB+l\\/Dh+M2ncwQq\\/kzjEQbSeVFY+0e4Rijs+1\\/Ty9IXWDX91cmCHtvs5ac2yJKRKKtInubUDbT7zhqnIsoIsZeILOgzsQiFJEicN7jvGSH+iJbsQsmFqiqLJlj5pxMUZJnESjcoI1ySKMygJz\\/54bhouohSkitdeyGu3bd\\/qpqH5UhMl4UtQH8\\/\\/3giXawpIuhHS7WJtGYok2FyW+fLvGGERWZLB6yuDwevLVwGfQFL3rAB5wUmKISq68OV2k22DudDUz0xYs\\/K5\\/Srcsa6voWuWKkRznrr2wPKlqYuSqMqqJCJTE7ZtUTdMSEFjXf1+2I+VjUNog3NVs2PJQja8tt3zqu0uqd6s7JTzH7u7fAnpg5udL8v2IA7n9nR+pUfxCYJWbM+OPeM0txO5oc1X8L9LeTHQBAZOvnx7Ik5I\\/trQY8\\/1mERR5l3n0jZyvQDW1yoBZMMMCLiw\\/hSVqyeF5uMqtZiJNMOo9pWlVDIqJK2QFVbolWkphb5HjBqFVJk34BNEDh7P\\/ZQPwKGX3UfJLckeYu99WK4wLKVSrpBO1QUrEVuoVFYWZlnJCySVFNEK0YJxa5xliW\\/vuEhgkk7NCXPjqv2xif6gKeLAwMuShw9t+WGa4SC4Nvmf\\/MAo8z68bN91QZNZdAud6n3PEnyd36eLyBVRlnTQhyka5iTz6\\/QZU64KuVT0SlpQVpgLFQq5sIpCWVg61bS9qZcqLWa\\/\\/wOX2crS\"}}";
+        flow = String.format(flow, placementId, appId, test, appId);
+        FlowRequest request = new FlowRequest(flow);
+//        request.setPath("http://fruit-console-sdk-1581845208.us-east-1.elb.amazonaws.com/sdk/settings/waterfall");
+        request.setPath("https://an.facebook.com/placementbid.ortb");
+        request.addHead(head);
+        request.setContentType("application/x-www-form-urlencoded;charset=UTF-8");
+//        request
+//        request.addParams(params);
+        request.setMethod(Method.POST);
+        Response response = manage.response(request);
+        System.out.println(response.getString());
+        System.out.println(response.getCode());
+    }
+
+    private static String getPayload() {
+        JSONObject payload = new JSONObject();
+
+        try {
+            payload.put("id", "84274a89d4644482b3be");
+            payload.put("imp", getImpFieldFromFormat());
+            payload.put("app", (new JSONObject()).put("publisher", (new JSONObject()).put("id", "378499546156658")));
+            payload.put("device", (new JSONObject()).put("lmt", 0));
+            payload.put("regs", (new JSONObject()).put("coppa", 0));
+            payload.put("at", 1);
+            payload.put("tmax", 1000);
+            payload.put("test", 1);
+            payload.put("ext", (new JSONObject()).put("platformid", "378499546156658").put("bidding_kit_version", "0.5.0").put("bidding_kit_source", "auction").putOpt("id", "QzM5UDO2gTO5QDM2EzX4UjN2UTM2QTN5kDN4czMfFjV").putOpt("timestamp", 1604998685934l));
+            payload.put("user", (new JSONObject()).put("buyeruid", "eJx1VFtvm0oQ\\/ivI56WVDN5d7s3T2sYxCsYcwImqcoQWWCcoGCwuSZsq\\/\\/3MgpMmD+WF3fnmPt\\/O7xkNguXB9dazbzM8m89uqRfQkO4iuP9OZmWX8tOQzL4lsyOrOp7M5smMnR\\/Trnzho1jVMbEwGoG+PPGXpuZpczx2vB9xYllIfBfLc9r1rO15kbacdU096nj04K+2Tphu9gd\\/ndLAJXjUh\\/AFz4b7e5ZVU7i+HaYkRnn6xKphAvwkSRZ0hLKhrIq0\\/3X+jLxCeQffjb9DaWMxcKerlRNF7tL1QJ46Pl16zvojHgQ+3TkgWZZFUdb3N2UfsdO5GsFNAIChosy0Mq2w7QxltmYeMTGRkTGeGUi3RVMjEWPvp7E7usIG0mzbMkxTUYkN+I7eCHnHTt1Q34NgRcPQdUKQCev1TbqiAZ2SBNkPda7N9bk5x3iOjTk2\\/wOtteNHE0wUg+jCbhU6jp9uHfd6G4PcNM2Lt1snFPmATFcMRWQYhHvRiGno57bJedelNTtNHcybk9IPzXl4ZrXy0Jx4wY+8vrABZsSKLr0Ygf7YOwDyquR1n3bD+dy0vUDE8F7\\/ZHbnruMthNSwSMFdp9H+EK5EJ5xdAKWMycKN1UXblAXc95FIXbQQjTc40XeQ+tTbX08l9E3PqvTET037ayzBtFRCVGyrxph0C3hfNnX6c0RlS0HYNLDhyPqI5w+svYdxj+jERfbEykrw8KNbTbeQiYmmWZ\\/dvkzcVxD4NCzLkbXP+GQtY0U1NU3TtTeFjPU9f\\/ONlenVHFvO0+7M8mkaGBHLVlXDJLZxYXUEb4deO74Y8655KauKJQtdQdIXr6yHn1fSpUsSRldStJOvbVNF0lK8k2Txb4Cpgm2oAwISUHh++irRM3D8jmfAd\\/CkAlMN6cvNNt55c6kqH7l0zfPH5qt0y9sOCkoWGkRbPbRAjmRhGQpSNKIhBVu6tGuysuJSxI6sLd+d\\/dgsqQ\\/vciiAJTn3ef\\/ctI+bpr2kerVZRgL\\/c7tNFpA+mC2Txd8YKWChpwjFpTjB\\/zYSzQCiw9lbJYuXh3Tlp\\/9sWd2JlxPu97Hztv92+7XjwfmtSSBawk7yBCv\\/FlRwL9pSwUbd5hbWTbM4FrZaEJwhPSMqbIICRpYZR8yZmaHCugIbb7+io98P+YDYd+K7fXiTxt8D55KUu95QOKKcFNhgmsxzzGWNEVW28oLIGOUMswKzjAttGsehuzzEYuO462mHwB57ezmKqMn1o5h63vuKuSyoUT1nGTOIqckYIwhzRLps21iTbaIeC2KSQtXQ7PV\\/sQ3LZw=="));
+        } catch (JSONException var5) {
+//            BkLog.e("FacebookBidderPayloadBuilder", "Creating Facebook Bidder Payload failed", var5);
+        }
+
+        String payloadString = payload.toString();
+//        BkLog.d("FacebookBidderPayloadBuilder", "Bid request for Facebook: " + payloadString);
+        return payloadString;
+    }
+
+    private static JSONArray getImpFieldFromFormat() throws JSONException {
+        return (new JSONArray()).put((new JSONObject()).put("id", "FB Ad Impression").put("tagid", "378499546156658_408632569810022").put("instl", 0).put("video", new JSONObject().put("h", 0).put("w", 0).put("linearity", 2).put("ext", new JSONObject().put("videotype", "rewarded"))));
+    }
+
+    public static String hmacSHA256(String data, String key) throws Exception {
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("utf-8"), "HmacSHA256");
+        sha256_HMAC.init(secret_key);
+        byte[] array = sha256_HMAC.doFinal(data.getBytes("utf-8"));
+        StringBuilder sb = new StringBuilder();
+        for (byte item : array) {
+            sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
+        }
+        return sb.toString().toLowerCase();
+
+    }
+
 
 //    script
 //    脚本Tag一般只有一个，是flv的第一个Tag，用于存放flv的信息，比如duration、audiodatarate、creator、width等。

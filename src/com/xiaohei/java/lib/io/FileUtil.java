@@ -1245,6 +1245,8 @@ public class FileUtil {
                     f.mkdir();
                 }
             }
+            if(theEntry.isDirectory())
+                continue;
 //	            F:/work/text
             System.out.println(zipBase + "/" + entryName);
             OutputStream os = new FileOutputStream(zipBase + "/" + entryName);

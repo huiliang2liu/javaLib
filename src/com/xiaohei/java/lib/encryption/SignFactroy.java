@@ -1,6 +1,6 @@
 package com.xiaohei.java.lib.encryption;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+//import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -52,7 +52,7 @@ public class SignFactroy {
     }
 
     public static ISign SHA3_256() {
-        Security.addProvider(new BouncyCastleProvider());
+//        Security.addProvider(new BouncyCastleProvider());
         return create("SHA3-256");
     }
 
