@@ -14,13 +14,11 @@ public class CPUThreadPool extends ThreadPoolExecutor {
     private final static int QUEUE_SIZE = 128;
 
     public CPUThreadPool() {
-        super(ThreadConstant.CPRE_POOL_SIZE + 1, ThreadConstant.MAXINUM_POOL_XIZE + 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(QUEUE_SIZE), new Factory());
-        handler = new ExecutionHandler();
-        setRejectedExecutionHandler(handler);
+        this(QUEUE_SIZE);
     }
 
     public CPUThreadPool(int size) {
-        super(size, size, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new Factory());
+        super(ThreadConstant.CPRE_POOL_SIZE + 1, ThreadConstant.MAXINUM_POOL_XIZE + 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(size), new Factory());
         handler = new ExecutionHandler();
         setRejectedExecutionHandler(handler);
     }

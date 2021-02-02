@@ -6,41 +6,23 @@ import java.util.Collection;
 import java.util.concurrent.*;
 
 public class IOThreadPool extends ThreadPoolExecutor {
-    private final static String TAG = "CPUThreadPool";
-    private ExecutionHandler handler;
-    private final static int QUEUE_SIZE = 128;
-    private static final float USE_RATIO=0.5f;
+    private final static int QUEUE_SIZE = Integer.MAX_VALUE;
+    private static final int MAX_THREAD=500;
 
     public IOThreadPool() {
-        this(USE_RATIO);
+        this(MAX_THREAD);
     }
 
-    public IOThreadPool(float useRatio) {
-        this((int) (ThreadConstant.CPRE_POOL_SIZE/useRatio),0);
+    public IOThreadPool(int  maxThread) {
+        this(maxThread,QUEUE_SIZE);
     }
-    private IOThreadPool(int threadNum,int a){
-        super(threadNum, threadNum<<1, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new Factory());
-        handler = new ExecutionHandler();
-        setRejectedExecutionHandler(handler);
+    private IOThreadPool(int threadNum,int queueSize){
+        super(threadNum, threadNum, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(queueSize));
     }
 
 
     @Override
     protected synchronized void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
-        BlockingQueue<Runnable> queue = getQueue();
-        int size = QUEUE_SIZE - queue.size();
-        if (size > 0 && size < QUEUE_SIZE) {
-            submit(handler.copy(size));
-        }
-    }
-
-
-    private void submit(Collection<Runnable> collection) {
-        if (collection == null || collection.size() <= 0)
-            return;
-        for (Runnable runnable : collection) {
-            submit(runnable);
-        }
     }
 }

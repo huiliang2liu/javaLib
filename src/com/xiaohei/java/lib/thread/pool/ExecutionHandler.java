@@ -9,12 +9,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class ExecutionHandler implements RejectedExecutionHandler {
     private final static String TAG = "ExecutionHandler";
+    private final static int MAX_SIZE=5000;
     List<Runnable> runnables = new ArrayList<>();
 
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+        JavaLog.e(TAG, "任务过多溢出");
         synchronized (this) {
-            JavaLog.e(TAG, "任务过多溢出，保存在队列中，用于下次使用");
+            if(runnables.size()>5000){
+                return;
+            }
+            JavaLog.e(TAG, "保存在队列中，用于下次使用");
             runnables.add(r);
         }
     }
