@@ -1,4 +1,4 @@
-package com.xiaohei.java.lib.paras;
+package com.xiaohei.java.lib.paras.xml;
 
 import java.io.File;
 import java.io.FileOutputStream;
