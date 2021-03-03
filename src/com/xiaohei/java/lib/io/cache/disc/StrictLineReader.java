@@ -1,4 +1,4 @@
-package com.xiaohei.java.lib.io.cache;
+package com.xiaohei.java.lib.io.cache.disc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
