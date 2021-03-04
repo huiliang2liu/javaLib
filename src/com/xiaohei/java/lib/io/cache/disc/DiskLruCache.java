@@ -77,6 +77,7 @@ final class DiskLruCache implements Closeable {
             return null;
         }
     };
+    private String fileEnd = "";
 
     private DiskLruCache(File directory, int appVersion, int valueCount, long maxSize, int maxFileCount) {
         this.directory = directory;
@@ -139,6 +140,10 @@ final class DiskLruCache implements Closeable {
         cache = new DiskLruCache(directory, appVersion, valueCount, maxSize, maxFileCount);
         cache.rebuildJournal();
         return cache;
+    }
+
+    public void setFileEnd(String fileEnd) {
+        this.fileEnd = fileEnd;
     }
 
     private void readJournal() throws IOException {
@@ -796,11 +801,11 @@ final class DiskLruCache implements Closeable {
         }
 
         public File getCleanFile(int i) {
-            return new File(directory, key + "" + i);
+            return new File(directory, key + "" + i + fileEnd);
         }
 
         public File getDirtyFile(int i) {
-            return new File(directory, key + "" + i + ".tmp");
+            return new File(directory, key + "" + i + fileEnd + ".tmp");
         }
     }
 }

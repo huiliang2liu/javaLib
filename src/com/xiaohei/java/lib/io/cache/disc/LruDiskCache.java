@@ -52,6 +52,9 @@ public class LruDiskCache {
         return cache.getDirectory();
     }
 
+    public void setFileEnd(String fileEnd) {
+        cache.setFileEnd(fileEnd);
+    }
 
     public File get(String url) {
         DiskLruCache.Snapshot snapshot = null;
