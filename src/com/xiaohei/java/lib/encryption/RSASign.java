@@ -12,6 +12,27 @@ public class RSASign implements ISign {
     private byte[] publicKey;
     private byte[] privateKey;
 
+    enum RsaType {
+        SHA256WITHRSA("SHA256WITHRSA"),
+        MD5WITHRSA("MD5WITHRSA"),
+        SHA1WITHRSA("SHA1WITHRSA"),
+        SHA512WITHRSA("SHA512WITHRSA"),
+        MD2WITHRSA("MD2WITHRSA"),
+        MD5ANDSHA1WITHRSA("MD5ANDSHA1WITHRSA"),
+        SHA224WITHRSA("SHA224WITHRSA"),
+        SHA384WITHRSA("SHA384WITHRSA");
+        private String type;
+
+        RsaType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
     public RSASign(String publicKey, String privateKey) {
         this.publicKey = Base64.decode(publicKey, 0);
         this.privateKey = Base64.decode(privateKey, 0);

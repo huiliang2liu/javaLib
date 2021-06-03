@@ -9,6 +9,29 @@ import java.security.spec.X509EncodedKeySpec;
 
 
 public class DSASign implements ISign {
+    enum DsaType {
+        NONEWITHDSA("NONEWITHDSA"),
+        SHA384WITHECDSA("SHA384WITHECDSA"),
+        SHA224WITHDSA("SHA224WITHDSA"),
+        SHA256WITHDSA("SHA256WITHDSA"),
+        SHA1WITHECDSA("SHA1WITHECDSA"),
+        NONEWITHECDSA("NONEWITHECDSA"),
+        SHA256WITHECDSA("SHA256WITHECDSA"),
+        SHA224WITHECDSA("SHA224WITHECDSA"),
+        SHA512WITHECDSA("SHA512WITHECDSA"),
+        SHA1WITHDSA("SHA1WITHDSA");
+        private String type;
+
+         DsaType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
     private byte[] publicKey;
     private byte[] privateKey;
 
