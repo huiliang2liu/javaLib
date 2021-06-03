@@ -10,6 +10,24 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class ECDSASign implements ISign{
+    enum ECDsaType{
+        SHA384WITHECDSA("SHA384WITHECDSA"),
+        SHA1WITHECDSA("SHA1WITHECDSA"),
+        NONEWITHECDSA("NONEWITHECDSA"),
+        SHA256WITHECDSA("SHA256WITHECDSA"),
+        SHA224WITHECDSA("SHA224WITHECDSA"),
+        SHA512WITHECDSA("SHA512WITHECDSA");
+        private String type;
+
+        ECDsaType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
     private static final char[] HEX = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final String SIGNALGORITHMS = "SHA256withECDSA";
     private static final String ALGORITHM = "EC";
