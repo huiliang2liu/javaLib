@@ -94,12 +94,12 @@ public class EncryptionFactory {
     }
 
     public static IEncryption Blowfish(String key) {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         return createSymmetry("Blowfish", new SecretKeySpec(key.getBytes(), "Blowfish"));
     }
 
     public static IEncryption Camellia(String key) {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
 //        16/24/32
         int len = key.length();
         if (len != 16 || len != 24 || len != 32) {
@@ -116,33 +116,33 @@ public class EncryptionFactory {
     }
 
     public static IEncryption IDEA(String key) {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         return createSymmetry(IDEA_CBC, new SecretKeySpec(key.getBytes(), IDEA));
     }
 
     public static IEncryption SEED(String key) throws Exception {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         KeyGenerator kgen = KeyGenerator.getInstance("SEED");
         kgen.init(128, new SecureRandom(key.getBytes()));
         return createSymmetry("SEED", new SecretKeySpec(kgen.generateKey().getEncoded(), "SEED"));
     }
 
     public static IEncryption ChaCha(String key) {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         if (key.length() < 16)
             key = getkey(key, 16);
         return createSymmetry("ChaCha", new SecretKeySpec(key.getBytes(), "ChaCha"));
     }
 
     public static IEncryption Rijndael(String key) throws Exception {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         KeyGenerator kgen = KeyGenerator.getInstance("Rijndael");
         kgen.init(128, new SecureRandom(key.getBytes()));
         return createSymmetry("Rijndael", new SecretKeySpec(kgen.generateKey().getEncoded(), "Rijndael"));
     }
 
     public static IEncryption ARC4(String key) throws Exception {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         KeyGenerator kgen = KeyGenerator.getInstance("ARC4");
         kgen.init(128, new SecureRandom(key.getBytes()));
         return createSymmetry("ARC4", new SecretKeySpec(kgen.generateKey().getEncoded(), "ARC4"));

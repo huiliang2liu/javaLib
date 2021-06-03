@@ -52,7 +52,7 @@ public class SignFactroy {
     }
 
     public static ISign SHA3_256() {
-//        Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         return create("SHA3-256");
     }
 
@@ -62,5 +62,13 @@ public class SignFactroy {
 
     public static ISign DSASign(String publicKey, String privateKey) {
         return new DSASign(publicKey, privateKey);
+    }
+
+    public static ISign HmacMD5Sign(String key) {
+        return new MacSign(key, "HmacMD5");
+    }
+
+    public static ISign HmacSHA256Sign(String key) {
+        return new MacSign(key, "HmacSHA256");
     }
 }
