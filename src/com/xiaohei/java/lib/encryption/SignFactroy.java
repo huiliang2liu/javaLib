@@ -64,11 +64,8 @@ public class SignFactroy {
         return new DSASign(publicKey, privateKey);
     }
 
-    public static ISign HmacMD5Sign(String key) {
-        return new MacSign(key, "HmacMD5");
+    public static ISign HmacMD5Sign(String key, MacSign.MacType type) {
+        return new MacSign(key, type);
     }
 
-    public static ISign HmacSHA256Sign(String key) {
-        return new MacSign(key, "HmacSHA256");
-    }
 }

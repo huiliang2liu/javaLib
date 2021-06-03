@@ -4,15 +4,48 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 class MacSign implements ISign {
+    enum MacType{
+        PBEWITHHMACSHA512("PBEWITHHMACSHA512"),
+        PBEWITHHMACSHA224("PBEWITHHMACSHA224"),
+        PBEWITHHMACSHA256("PBEWITHHMACSHA256"),
+        HMACSHA384("HMACSHA384"),
+        PBEWITHHMACSHA384("PBEWITHHMACSHA384"),
+        HMACSHA256("HMACSHA256"),
+        HMACPBESHA1("HMACPBESHA1"),
+        HMACSHA224("HMACSHA224"),
+        HMACMD5("HMACMD5"),
+        PBEWITHHMACSHA1("PBEWITHHMACSHA1"),
+        SSLMACSHA1("SSLMACSHA1"),
+        HMACSHA512("HMACSHA512"),
+        SSLMACMD5("SSLMACMD5"),
+        HMACSHA1("HMACSHA1");
+
+        private String type;
+        private MacType(String type){
+           this.type=type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
+
+
+
+
+
+
     private byte[] key;
     private String type;
 
-    public MacSign(String sKey, String type) {
+    public MacSign(String sKey, MacType type) {
         key = Base64.decode(sKey.getBytes(), 0);
-        if ("HmacMD5".equals(type))
-            this.type = type;
+        if(type==null)
+            this.type="HMACSHA256";
         else
-            this.type = "HmacSHA256";
+            this.type=type.toString();
     }
 
     @Override
