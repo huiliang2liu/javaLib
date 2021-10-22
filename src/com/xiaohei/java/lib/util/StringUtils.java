@@ -1,8 +1,8 @@
 package com.xiaohei.java.lib.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtils {
     public static boolean isEmpty(CharSequence cs) {
@@ -453,6 +453,30 @@ public class StringUtils {
                 return argb(a, r, g, b);
             }
         }
+    }
+
+    public static Map<String, Integer> statisticalChinese(String text) {
+        return statistical(text, "[\\u4e00-\\u9fa5]");
+    }
+
+    public static Map<String, Integer> statisticalWord(String text) {
+        return statistical(text, "\\b([a-zA-Z`]+)\\b");
+    }
+
+    private static Map<String, Integer> statistical(String text, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
+        Map<String, Integer> map = new HashMap();
+        String key;
+        while (matcher.find()) {
+            key = matcher.group();
+            if (map.containsKey(key)) {
+                map.put(key, map.get(key) + 1);
+                continue;
+            }
+            map.put(key, 1);
+        }
+        return map;
     }
 
 }

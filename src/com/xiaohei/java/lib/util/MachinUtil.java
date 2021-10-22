@@ -95,7 +95,7 @@ public class MachinUtil {
         proxyAddress = System.getProperty("http.proxyHost");
         String portStr = System.getProperty("http.proxyPort");
         proxyPort = Integer.parseInt((portStr != null ? portStr : "-1"));
-        return proxyAddress != null && !proxyAddress.isEmpty() && proxyPort != 1;
+        return proxyAddress != null && !proxyAddress.isEmpty() && proxyPort != -1;
     }
 
     public static void noHttpProxy() {
