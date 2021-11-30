@@ -78,7 +78,7 @@ public class Request {
         head.put(
                 "User-Agent",
                 MachinUtil.getUserAgent());
-        head.put("Content-Type", "application/x-www-from-urlencoded");
+        head.put("Content-Type", "application/x-www-form-urlencoded");
         head.put("Charset", "utf-8");
         method = Method.GET;
     }
