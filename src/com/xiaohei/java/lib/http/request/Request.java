@@ -69,7 +69,7 @@ public class Request {
     {
         params = new HashMap<String, String>();
         head = new HashMap<String, String>();
-        head.put("Accept", "text/html");
+        head.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         head.put("Accept-Charset", "utf-8");
         head.put("Accetpt-Encoding", "deflate");
         head.put("Accept-Language", "zh-cn");
@@ -320,7 +320,7 @@ public class Request {
 
     public void report(OutputStream os) {
         String params = params2string();
-        System.out.println(params);
+//        System.out.println(params);
         if (params == null)
             return;
         try {
